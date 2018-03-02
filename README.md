@@ -1,4 +1,4 @@
-ICP-Brasil Authenticator - Keycloak
+ICP-Brasil Authenticator - Keycloak v3.4.3.FINAL
 ===================================================
 
 1. Keycloak must be configured to request the client certificate, to configure see the following item in Keycloak guide [Enable X.509 Cliente Certificate User Authentication](https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/authentication/x509.adoc#enable-x509-client-certificate-user-authentication)
