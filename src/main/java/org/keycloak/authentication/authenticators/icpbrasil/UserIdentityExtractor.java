@@ -25,17 +25,16 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.keycloak.services.ServicesLogger;
 
-import java.io.IOException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:pnalyvayko@agi.com">Peter Nalyvayko</a>
- * @author <a href="mailto:luneo7@gmail.com">Lucas Rogerio Caetano Ferreira</a>
+ * @author @author <a href="mailto:luneo7@gmail.com">Lucas Rogerio Caetano Ferreira</a>
  * @version $Revision: 1 $
  * @date 8/9/2017
  */
@@ -76,10 +75,10 @@ public abstract class UserIdentityExtractor {
         protected static final String PESSOA_JURIDICA_OBJECTID = "2.16.76.1.3.3";
 
 
-        Function<X509Certificate[],Collection<List<?>>> x509SubjectAlternativeNames;
+        Function<X509Certificate[],Collection<?>> x509SubjectAlternativeNames;
         ICPBrasilAuthenticatorConfigModel.MappingSourceType mappingSourceType;
 
-        ICPBrasilExtractor(Function<X509Certificate[],Collection<List<?>>> x509SubjectAlternativeNames, ICPBrasilAuthenticatorConfigModel.MappingSourceType mappingSourceType) {
+        ICPBrasilExtractor(Function<X509Certificate[],Collection<?>> x509SubjectAlternativeNames, ICPBrasilAuthenticatorConfigModel.MappingSourceType mappingSourceType) {
             this.x509SubjectAlternativeNames = x509SubjectAlternativeNames;
             this.mappingSourceType = mappingSourceType;
         }
@@ -90,19 +89,26 @@ public abstract class UserIdentityExtractor {
             if (certs == null || certs.length == 0)
                 throw new IllegalArgumentException();
 
-            Collection<List<?>> subjectAltNames = x509SubjectAlternativeNames.apply(certs);
+            Collection<?> subjectAltNames = x509SubjectAlternativeNames.apply(certs);
 
             if (subjectAltNames != null) {
 
-                for (final List<?> sanItem : subjectAltNames) {
-                    final ASN1Sequence seq = getAltnameSequence(sanItem);
+                for (final Object obj : subjectAltNames) {
+                    if (obj instanceof ArrayList) {
 
-                    final String ICPBrasilString = getICPBrasilStringFromSequence(seq);
+                        final Object value = ((ArrayList) obj).get(1);
 
-                    if (ICPBrasilString != null) {
-                        return ICPBrasilString;
+                        if (value instanceof ASN1Sequence) {
+
+                            final String ICPBrasilString = getICPBrasilStringFromSequence((ASN1Sequence) value);
+
+                            if (ICPBrasilString != null) {
+                                return ICPBrasilString;
+                            }
+
+                        }
+
                     }
-
                 }
             }
             return null;
@@ -149,30 +155,6 @@ public abstract class UserIdentityExtractor {
                 }
             }
             return null;
-        }
-
-        private ASN1Sequence getAltnameSequence(final List<?> sanItem) {
-            //Should not be the case, but still, a extra "safety" check
-            if (sanItem.size() < 2) {
-                logger.error("Subject Alternative Name List does not contain at least two required elements. Returning null principal id...");
-            }
-            final Integer itemType = (Integer) sanItem.get(0);
-            if (itemType == 0) {
-                final byte[] altName = (byte[]) sanItem.get(1);
-                return getAltnameSequence(altName);
-            }
-            return null;
-        }
-
-        private ASN1Sequence getAltnameSequence(final byte[] sanValue) {
-            ASN1Primitive oct = null;
-            try (final ASN1InputStream input = new ASN1InputStream(sanValue)) {
-                oct = input.readObject();
-            } catch (final IOException e) {
-                logger.error("Error on getting Alt Name as a DERSEquence: {}", e.getMessage(), e);
-                return null;
-            }
-            return ASN1Sequence.getInstance(oct);
         }
     }
 
@@ -254,7 +236,7 @@ public abstract class UserIdentityExtractor {
         return new X500NameRDNExtractor(identifier, x500Name);
     }
 
-    public static UserIdentityExtractor getICPBrasilExtractor(Function<X509Certificate[],Collection<List<?>>> x509SubjectAlternativeNames, ICPBrasilAuthenticatorConfigModel.MappingSourceType mappingSourceType) {
+    public static UserIdentityExtractor getICPBrasilExtractor(Function<X509Certificate[],Collection<?>> x509SubjectAlternativeNames, ICPBrasilAuthenticatorConfigModel.MappingSourceType mappingSourceType) {
         return new ICPBrasilExtractor(x509SubjectAlternativeNames, mappingSourceType);
     }
 
