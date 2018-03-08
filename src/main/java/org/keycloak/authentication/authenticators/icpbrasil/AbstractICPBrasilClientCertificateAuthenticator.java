@@ -123,20 +123,14 @@ public abstract class AbstractICPBrasilClientCertificateAuthenticator implements
             return null;
         };
 
-        private static final Function<X509Certificate[],Collection<?>> subjectAlternativeNames;
-
-        static {
-            subjectAlternativeNames = certs -> {
-                try {
-
-                    return X509ExtensionUtil.getSubjectAlternativeNames(certs[0]);
-                } catch (CertificateParsingException e) {
-
-                    logger.warn("Unable to get certificate Subject Alternative Names", e);
-                }
-                return null;
-            };
-        }
+        private static final Function<X509Certificate[],Collection<?>> subjectAlternativeNames = certs -> {
+            try {
+                return X509ExtensionUtil.getSubjectAlternativeNames(certs[0]);
+            } catch (CertificateParsingException e) {
+                logger.warn("Unable to get certificate Subject Alternative Names", e);
+            }
+            return null;
+        };
 
         private static final Function<X509Certificate[],X500Name> issuer = certs -> {
             try {

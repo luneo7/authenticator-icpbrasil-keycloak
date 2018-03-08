@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:pnalyvayko@agi.com">Peter Nalyvayko</a>
- * @author @author <a href="mailto:luneo7@gmail.com">Lucas Rogerio Caetano Ferreira</a>
+ * @author <a href="mailto:luneo7@gmail.com">Lucas Rogerio Caetano Ferreira</a>
  * @version $Revision: 1 $
  * @date 8/9/2017
  */
