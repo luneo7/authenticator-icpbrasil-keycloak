@@ -36,3 +36,13 @@ A pasta deve ficar no format `<caminho_keycloak>/themes/base`
 8. Move the item "ICPBrasil/Validate Username Form" so that it is before "Browser Forms". Enable it by selecting "ALTERNATIVE" in the "Requirement" column. Configure it by going to the "Actions" column and clicking "Config".
 
 9. In the configuration, in the item "User Identity Source", select one of the options related to ICPBrasil (Subject's CPF, Subject's CNPJ, Subject's CPF or CNPJ). Under "User mapping method" select "Username or Email". In the "A name of user attribute" fill in with "uid".
+
+## Rodando via docker
+
+Como demonstração, existe a imagem `quay.io/weltonrodrigo/authenticator-icpbrasil-keycloak:latest`,
+analize o dockerfile neste repositório para entender como ela é montada.
+
+```shell
+docker run --name keycloak -ti -p 8080:8080 \
+  quay.io/weltonrodrigo/authenticator-icpbrasil-keycloak:latest
+```
