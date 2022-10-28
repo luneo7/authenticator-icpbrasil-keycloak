@@ -18,9 +18,10 @@
 
 package org.keycloak.authentication.authenticators.icpbrasil;
 
-import org.keycloak.common.util.CRLUtils;
-import org.keycloak.common.util.OCSPUtils;
+import org.keycloak.authentication.authenticators.x509.OCSPUtils;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.ServicesLogger;
+import org.keycloak.utils.CRLUtils;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -62,6 +63,7 @@ import java.util.ArrayList;
 public class CertificateValidator {
 
     private static final ServicesLogger logger = ServicesLogger.LOGGER;
+    private KeycloakSession keycloakSession;
 
     enum KeyUsageBits {
         DIGITAL_SIGNATURE(0, "digitalSignature"),
@@ -150,7 +152,10 @@ public class CertificateValidator {
     public static class BouncyCastleOCSPChecker extends OCSPChecker {
 
         private final String responderUri;
-        BouncyCastleOCSPChecker(String responderUri) {
+        private KeycloakSession keycloakSession;
+
+        BouncyCastleOCSPChecker(KeycloakSession keycloakSession, String responderUri) {
+            this.keycloakSession = keycloakSession;
             this.responderUri = responderUri;
         }
 
@@ -168,7 +173,8 @@ public class CertificateValidator {
                 // 1) signed by the issuer certificate,
                 // 2) Includes the value of OCSPsigning in ExtendedKeyUsage v3 extension
                 // 3) Certificate is valid at the time
-                ocspRevocationStatus = OCSPUtils.check(cert, issuerCertificate);
+
+                ocspRevocationStatus = OCSPUtils.check(keycloakSession, cert, issuerCertificate);
             }
             else {
                 URI uri;
@@ -183,7 +189,7 @@ public class CertificateValidator {
                 // OCSP responder's certificate is assumed to be the issuer's certificate
                 // certificate.
                 // responderUri overrides the contents (if any) of the certificate's AIA extension
-                ocspRevocationStatus = OCSPUtils.check(cert, issuerCertificate, uri, null, null);
+                ocspRevocationStatus = OCSPUtils.check(keycloakSession, cert, issuerCertificate, uri, null, null);
             }
             return ocspRevocationStatus;
         }
@@ -335,12 +341,12 @@ public class CertificateValidator {
 
     }
     protected CertificateValidator(X509Certificate[] certChain,
-                         int keyUsageBits, List<String> extendedKeyUsage,
+                                   int keyUsageBits, List<String> extendedKeyUsage,
                                    boolean cRLCheckingEnabled,
                                    boolean cRLDPCheckingEnabled,
                                    CRLLoaderImpl crlLoader,
                                    boolean oCSPCheckingEnabled,
-                                   OCSPChecker ocspChecker) {
+                                   OCSPChecker ocspChecker, KeycloakSession keycloakSession) {
         _certChain = certChain;
         _keyUsageBits = keyUsageBits;
         _extendedKeyUsage = extendedKeyUsage;
@@ -349,6 +355,7 @@ public class CertificateValidator {
         _crlLoader = crlLoader;
         _ocspEnabled = oCSPCheckingEnabled;
         this.ocspChecker = ocspChecker;
+        this.keycloakSession = keycloakSession;
 
         if (ocspChecker == null)
             throw new IllegalArgumentException("ocspChecker");
@@ -530,10 +537,16 @@ public class CertificateValidator {
         CRLLoaderImpl _crlLoader;
         boolean _ocspEnabled;
         String _responderUri;
+        private KeycloakSession keycloakSession;
 
         public CertificateValidatorBuilder() {
             _extendedKeyUsage = new LinkedList<>();
             _keyUsageBits = 0;
+        }
+
+        public CertificateValidatorBuilder session(KeycloakSession keycloakSession) {
+            this.keycloakSession = keycloakSession;
+            return this;
         }
 
         public class KeyUsageValidationBuilder {
@@ -700,7 +713,8 @@ public class CertificateValidator {
                  _crlLoader = new CRLFileLoader("");
             }
             return new CertificateValidator(certs, _keyUsageBits, _extendedKeyUsage,
-                    _crlCheckingEnabled, _crldpEnabled, _crlLoader, _ocspEnabled, new BouncyCastleOCSPChecker(_responderUri));
+                    _crlCheckingEnabled, _crldpEnabled, _crlLoader, _ocspEnabled,
+                    new BouncyCastleOCSPChecker(keycloakSession, _responderUri), keycloakSession);
         }
     }
 

@@ -23,14 +23,12 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.cert.X509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -90,10 +88,11 @@ public abstract class AbstractICPBrasilClientCertificateAuthenticator implements
 
     protected static class CertificateValidatorConfigBuilder {
 
-        static CertificateValidator.CertificateValidatorBuilder fromConfig(ICPBrasilAuthenticatorConfigModel config) throws Exception {
+        static CertificateValidator.CertificateValidatorBuilder fromConfig(KeycloakSession keycloakSession, ICPBrasilAuthenticatorConfigModel config) throws Exception {
 
             CertificateValidator.CertificateValidatorBuilder builder = new CertificateValidator.CertificateValidatorBuilder();
             return builder
+                    .session(keycloakSession)
                     .keyUsage()
                         .parse(config.getKeyUsage())
                     .extendedKeyUsage()
@@ -108,8 +107,8 @@ public abstract class AbstractICPBrasilClientCertificateAuthenticator implements
     }
 
     // The method is purely for purposes of facilitating the unit testing
-    public CertificateValidator.CertificateValidatorBuilder certificateValidationParameters(ICPBrasilAuthenticatorConfigModel config) throws Exception {
-        return CertificateValidatorConfigBuilder.fromConfig(config);
+    public CertificateValidator.CertificateValidatorBuilder certificateValidationParameters(KeycloakSession keycloakSession, ICPBrasilAuthenticatorConfigModel config) throws Exception {
+        return CertificateValidatorConfigBuilder.fromConfig(keycloakSession, config);
     }
 
     protected static class UserIdentityExtractorBuilder {

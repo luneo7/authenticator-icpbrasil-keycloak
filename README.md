@@ -1,19 +1,33 @@
-ICP-Brasil Authenticator - Keycloak v3.4.3.FINAL
+ICP-Brasil Authenticator - Keycloak v19.0.3
 ===================================================
 
-1. Keycloak must be configured to request the client certificate, to configure see the following item in Keycloak guide [Enable X.509 Cliente Certificate User Authentication](https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/authentication/x509.adoc#enable-x509-client-certificate-user-authentication)
+Versão com suporte ao keycloak 19.0.3, está sendo disponibilizado para coletar feedback, uma vez que 
+eu não possuo um certificado ICP para testes.
 
-2. Keycloak must be in execution
+[[ATENÇÃO]]
+[[ATENÇÃO]]
+[[ATENÇÃO]]
 
-3. The project must be compiled e installed with the following deploy command
+ESTE SOFTWARE VEM SEM NENHUMA GARANTIA DE FUNCIONAMENTO OU DE SUPORTE. Caso encontre algum problema com ele, eu posso 
+tentar ajudar, no meu próprio tempo e no meu próprio limite, caso você abra uma issue, mas ISSO NÃO É GARANTIA 
+NENHUMA DE QUE VOCÊ VAI SER RESPONDIDO.
 
-```bash
-   $ ./mvnw clean install wildfly:deploy
-```
+[[ATENÇÃO]]
+[[ATENÇÃO]]
+[[ATENÇÃO]]
 
-4. Copy the "login-icpbrasil-info.ftl" file to the folder "themes/base/login" that's inside the Keycloak install directory
+1. Necessário configurar o keycloak para autenticação mutual-tls (mTLS). Isso vai depender do proxy reverso que estiver
+na frente do Keycloak ou do próprio keycloak.
+2. Necessário incluir um truststore com as cadeias do ICP Brasil e configurar o keycloak para usá-las.
+3. Necessário configurar o autenticador conforme item 6 deste documento.
+4. Adicionar o arquivo jar na pasta /provided do Keycloak 19.0.3
+5. Extrair os arquivos na pasta `lib/lib/main/org.keycloak.keycloak-themes-19.0.3.jar` dentro da pasta `/themes` do keycloak 19.0.3
+A pasta deve ficar no format `<caminho_keycloak>/themes/base`
+6. Copiar o arquivo `login-icpbrasil-info.ftl` deste repositório para a pasta `<caminho_keycloak>/themes/base/login`
 
-5. Login in the administrative console.
+
+## Como configurar o autenticador:
+6. Login in the administrative console.
 
 6. Go to the "Authentication" page, in the "Flows" tab you will see the current authentication flows. It's not possible to alter the defaults, so you have to create or to copy one. Copy the "Browser" flow.
 
