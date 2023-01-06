@@ -1,7 +1,7 @@
-ICP-Brasil Authenticator - Keycloak v19.0.3
+ICP-Brasil Authenticator - Keycloak v19.0.3+
 ===================================================
 
-Versão com suporte ao keycloak 19.0.3, está sendo disponibilizado para coletar feedback, uma vez que 
+Versão com suporte ao keycloak 19.0.3 (e talvez posteriores), está sendo disponibilizado para coletar feedback, uma vez que 
 eu não possuo um certificado ICP para testes.
 
 [[ATENÇÃO]]
