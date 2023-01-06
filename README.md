@@ -27,15 +27,11 @@ A pasta deve ficar no format `<caminho_keycloak>/themes/base`
 
 
 ## Como configurar o autenticador:
-6. Login in the administrative console.
-
-6. Go to the "Authentication" page, in the "Flows" tab you will see the current authentication flows. It's not possible to alter the defaults, so you have to create or to copy one. Copy the "Browser" flow.
-
-7. In your copy, click "Add Execution".  Select "ICPBrasil/Validate Username Form" and click "Save"
-
-8. Move the item "ICPBrasil/Validate Username Form" so that it is before "Browser Forms". Enable it by selecting "ALTERNATIVE" in the "Requirement" column. Configure it by going to the "Actions" column and clicking "Config".
-
-9. In the configuration, in the item "User Identity Source", select one of the options related to ICPBrasil (Subject's CPF, Subject's CNPJ, Subject's CPF or CNPJ). Under "User mapping method" select "Username or Email". In the "A name of user attribute" fill in with "uid".
+7. Faça login na console administrativa.
+8. Vá para a página "Authentication", na aba "Flows" você verá os fluxos de autenticação atuais. Não é possível alterar os padrões, então você deve criar ou copiar um. Copie o fluxo "Browser".
+9. Em sua cópia, clique em "Add Execution". Selecione "ICPBrasil/Validate Username Form" e clique em "Save".
+10. Mova o item "ICPBrasil/Validate Username Form" para que fique antes de "Browser Forms". Ative-o selecionando "ALTERNATIVE" na coluna "Requirement". Configure-o ao ir para a coluna "Actions" e clicar em "Config".
+11. Na configuração, no item "User Identity Source", selecione uma das opções relacionadas ao ICPBrasil (Subject's CPF, Subject's CNPJ, Subject's CPF or CNPJ). Sob "User mapping method" selecione "Username or Email". Em "A name of user attribute" preencha com "uid".
 
 ## Rodando via docker
 
